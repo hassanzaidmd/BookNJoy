@@ -41,7 +41,11 @@ app.get('/status', (req, res) => {
     timestamp: new Date() 
   });
 });
-
+app.get('/', (req, res) => {
+  res.json({ 
+    "message":"BookNJoy Api is running"
+  });
+});
 const PORT = process.env.PORT || 5000;
 let mongoServer;
 

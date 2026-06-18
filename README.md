@@ -6,6 +6,7 @@ Node.js, Express, MongoDB, and React (Vite). It focuses on seat reservation, boo
 ## Live Demo
 - Frontend: [https://book-n-joy.vercel.app](https://book-n-joy.vercel.app)
 - Backend: [https://booknjoy.onrender.com](https://booknjoy.onrender.com)
+- The Backend is deployed on render which is on lazy loading, so intial loading may take 20 secs to a minute or two.
 
 ## Features
 - Event listing with basic event details
