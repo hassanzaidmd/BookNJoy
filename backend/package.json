@@ -1,7 +1,7 @@
 {
-  "name": "sort-my-scene-backend",
+  "name": "booknjoy-backend",
   "version": "1.0.0",
-  "description": "Backend service for Sort My Scene - Event Ticket Booking Flow",
+  "description": "Backend service for BookNJoy - Event Ticket Booking Flow",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

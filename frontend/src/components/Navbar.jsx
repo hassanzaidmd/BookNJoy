@@ -13,18 +13,53 @@ const Navbar = ({ user, onLogout, onOpenAuth }) => {
         alignItems: 'center' 
       }}>
         {/* Logo Branding */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
-          <Ticket style={{ color: 'var(--primary)', width: '28px', height: '28px' }} />
-          <span style={{ 
-            fontSize: '1.5rem', 
-            fontWeight: '800', 
-            letterSpacing: '-0.02em', 
-            background: 'linear-gradient(135deg, #a855f7 0%, #6366f1 100%)', 
-            WebkitBackgroundClip: 'text', 
-            WebkitTextFillColor: 'transparent' 
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', cursor: 'pointer' }}>
+          <div style={{
+            width: '46px',
+            height: '46px',
+            borderRadius: '16px',
+            display: 'grid',
+            placeItems: 'center',
+            background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.22) 0%, rgba(168, 85, 247, 0.28) 100%)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            boxShadow: '0 8px 24px rgba(99, 102, 241, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.08)'
           }}>
-            SORT MY SCENE
-          </span>
+            <Ticket style={{ color: 'white', width: '22px', height: '22px' }} strokeWidth={2.2} />
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.05 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+              <span style={{ 
+                fontSize: '1.35rem', 
+                fontWeight: '800', 
+                letterSpacing: '-0.04em', 
+                color: 'var(--text-main)' 
+              }}>
+                BookNJoy
+              </span>
+              <span style={{
+                padding: '4px 9px',
+                borderRadius: '9999px',
+                fontSize: '0.68rem',
+                fontWeight: '700',
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                color: '#c4b5fd',
+                background: 'rgba(99, 102, 241, 0.12)',
+                border: '1px solid rgba(99, 102, 241, 0.18)'
+              }}>
+                Live Booking
+              </span>
+            </div>
+            <span style={{
+              marginTop: '4px',
+              fontSize: '0.8rem',
+              color: 'var(--text-muted)',
+              letterSpacing: '0.01em'
+            }}>
+              Book seats. Secure joy.
+            </span>
+          </div>
         </div>
 
         {/* User Auth Section */}

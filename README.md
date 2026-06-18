@@ -1,4 +1,4 @@
-# Sort My Scene - Event Ticket Booking Flow
+# BookNJoy - Event Ticket Booking Flow
 
 A simplified event ticket booking application built using the MERN stack (Node.js, Express, MongoDB, and React.js). This project focuses on real-time seat reservation, atomic concurrency safety, and booking confirmation with active countdown timers.
 
@@ -43,7 +43,7 @@ A simplified event ticket booking application built using the MERN stack (Node.j
    Or create `.env` manually:
    ```env
    PORT=5000
-   MONGO_URI=mongodb://localhost:27017/sortmyscene
+   MONGO_URI=mongodb://localhost:27017/booknjoy
    JWT_SECRET=your_custom_secret_key
    ```
    *Note: If no `.env` is created, the server will fallback to a **MongoDB Memory Server** running on port `5000` and automatically seed the database.*

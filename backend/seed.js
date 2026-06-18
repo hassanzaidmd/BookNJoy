@@ -77,7 +77,7 @@ const seedData = async () => {
 if (require.main === module) {
   const run = async () => {
     try {
-      const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/sortmyscene';
+      const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/booknjoy';
       console.log(`[Seed CLI] Connecting to MongoDB at: ${mongoUri}`);
       await mongoose.connect(mongoUri);
       await seedData();
