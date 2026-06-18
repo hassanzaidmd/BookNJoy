@@ -19,6 +19,7 @@
   --seat-selected-glow: rgba(217, 70, 239, 0.5);
   --seat-reserved-others: #f59e0b; /* Amber */
   --seat-reserved-self: #3b82f6; /* Blue */
+  --seat-booked-self: #06b6d4; /* Cyan */
   --seat-booked: #10b981; /* Emerald */
   
   --text-main: #f8fafc;

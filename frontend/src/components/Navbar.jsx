@@ -1,7 +1,7 @@
 import React from 'react';
-import { Ticket, LogOut, User, LogIn } from 'lucide-react';
+import { Ticket, LogOut, User, LogIn, ChevronRight } from 'lucide-react';
 
-const Navbar = ({ user, onLogout, onOpenAuth }) => {
+const Navbar = ({ user, onLogout, onOpenAuth, onOpenMyTickets }) => {
   return (
     <header className="glass-panel" style={{ borderRadius: '0 0 16px 16px', borderTop: 'none', marginBottom: '32px' }}>
       <div style={{ 
@@ -66,20 +66,26 @@ const Navbar = ({ user, onLogout, onOpenAuth }) => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           {user ? (
             <>
-              <div style={{ 
+              <button
+                onClick={onOpenMyTickets}
+                type="button"
+                style={{ 
                 display: 'flex', 
                 alignItems: 'center', 
                 gap: '8px', 
                 padding: '6px 14px', 
                 background: 'rgba(255,255,255,0.03)', 
                 borderRadius: '9999px', 
-                border: '1px solid var(--border)' 
+                border: '1px solid var(--border)',
+                cursor: 'pointer',
+                color: 'inherit'
               }}>
                 <User size={16} style={{ color: 'var(--text-muted)' }} />
                 <span style={{ fontSize: '0.875rem', fontWeight: '600', color: 'var(--text-main)' }}>
                   Hi, {user.name}
                 </span>
-              </div>
+                <ChevronRight size={14} style={{ color: 'var(--text-muted)' }} />
+              </button>
               
               <button 
                 onClick={onLogout} 

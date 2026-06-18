@@ -5,8 +5,7 @@ import EventCard from './components/EventCard';
 import SeatMap from './components/SeatMap';
 import BookingSummary from './components/BookingSummary';
 import { ArrowLeft, RefreshCw, Info, AlertTriangle, CheckCircle, Ticket } from 'lucide-react';
-
-const API_BASE = 'http://localhost:5000';
+import API_BASE from './config';
 
 function App() {
   // Global States
@@ -17,6 +16,8 @@ function App() {
   const [eventDetails, setEventDetails] = useState(null);
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [activeReservation, setActiveReservation] = useState(null);
+  const [myTickets, setMyTickets] = useState([]);
+  const [loadingMyTickets, setLoadingMyTickets] = useState(false);
   const [toasts, setToasts] = useState([]);
   
   // UI states
@@ -24,6 +25,7 @@ function App() {
   const [loadingEvents, setLoadingEvents] = useState(true);
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [bookingLoading, setBookingLoading] = useState(false);
+  const [showMyTickets, setShowMyTickets] = useState(false);
 
   // 1. Toast Notification Helper
   const showToast = useCallback((message, type = 'info') => {
@@ -61,6 +63,32 @@ function App() {
       setLoadingEvents(false);
     }
   }, [showToast]);
+
+  const fetchMyTickets = useCallback(async () => {
+    if (!token) {
+      setMyTickets([]);
+      return;
+    }
+
+    setLoadingMyTickets(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/bookings/me`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.message || 'Failed to fetch your tickets');
+
+      setMyTickets(data);
+    } catch (err) {
+      console.error(err);
+      showToast(err.message || 'Failed to load your tickets.', 'error');
+    } finally {
+      setLoadingMyTickets(false);
+    }
+  }, [token, showToast]);
 
   useEffect(() => {
     fetchEvents();
@@ -129,6 +157,7 @@ function App() {
     }
     // Refresh global events list
     fetchEvents();
+    fetchMyTickets();
   };
 
   const handleLogout = () => {
@@ -138,6 +167,8 @@ function App() {
     setToken(null);
     setActiveReservation(null);
     setSelectedSeats([]);
+    setShowMyTickets(false);
+    setMyTickets([]);
     showToast('Logged out successfully.', 'success');
     
     // Refresh selected event details without token
@@ -279,16 +310,112 @@ function App() {
     fetchEvents();
   }, [selectedEventId, fetchEventDetails, fetchEvents, showToast]);
 
+  const handleOpenMyTickets = () => {
+    if (!user) {
+      setAuthModalOpen(true);
+      return;
+    }
+
+    setShowMyTickets(true);
+    fetchMyTickets();
+    setSelectedEventId(null);
+    setEventDetails(null);
+    setActiveReservation(null);
+    setSelectedSeats([]);
+  };
+
+  const handleBackToBrowse = () => {
+    setShowMyTickets(false);
+    fetchEvents();
+  };
+
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       
       {/* Navigation */}
-      <Navbar user={user} onLogout={handleLogout} onOpenAuth={() => setAuthModalOpen(true)} />
+      <Navbar
+        user={user}
+        onLogout={handleLogout}
+        onOpenAuth={() => setAuthModalOpen(true)}
+        onOpenMyTickets={handleOpenMyTickets}
+      />
 
       {/* Main Container */}
       <main style={{ flex: 1, width: '100%', maxWidth: '1200px', margin: '0 auto', padding: '0 24px 60px' }}>
         
-        {!selectedEventId ? (
+        {showMyTickets ? (
+          <div>
+            <button 
+              onClick={handleBackToBrowse} 
+              className="btn-secondary"
+              style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px', padding: '8px 16px' }}
+            >
+              <ArrowLeft size={16} />
+              <span>Back to Events</span>
+            </button>
+
+            <div className="glass-panel" style={{ padding: '28px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px', marginBottom: '24px', flexWrap: 'wrap' }}>
+                <div>
+                  <h2 style={{ fontSize: '1.75rem', fontWeight: '800', marginBottom: '6px' }}>Ticket Booked by Me</h2>
+                  <p style={{ color: 'var(--text-muted)' }}>Your confirmed bookings and seat details.</p>
+                </div>
+                <button
+                  onClick={fetchMyTickets}
+                  className="btn-secondary"
+                  style={{ padding: '10px 14px', borderRadius: 'var(--radius-md)', gap: '6px' }}
+                  disabled={loadingMyTickets}
+                >
+                  <RefreshCw size={16} className={loadingMyTickets ? 'animate-spin' : ''} />
+                  <span>Refresh</span>
+                </button>
+              </div>
+
+              {loadingMyTickets ? (
+                <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-muted)' }}>
+                  Loading your tickets...
+                </div>
+              ) : myTickets.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-muted)' }}>
+                  No booked tickets found yet.
+                </div>
+              ) : (
+                <div style={{ display: 'grid', gap: '16px' }}>
+                  {myTickets.map((ticket) => (
+                    <div key={ticket.event.id} style={{ padding: '20px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', background: 'rgba(255,255,255,0.03)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', flexWrap: 'wrap' }}>
+                        <div>
+                          <h3 style={{ fontSize: '1.15rem', fontWeight: '700', marginBottom: '6px' }}>{ticket.event.name}</h3>
+                          <p style={{ color: 'var(--text-muted)', fontSize: '0.92rem' }}>
+                            {ticket.event.venue} • {new Date(ticket.event.date).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}
+                          </p>
+                        </div>
+                        <span className="badge badge-success">Confirmed</span>
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px', marginTop: '18px' }}>
+                        <div>
+                          <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '4px' }}>Seats</div>
+                          <div style={{ fontWeight: '700', color: 'var(--text-main)' }}>{ticket.seatNumbers.join(', ')}</div>
+                        </div>
+                        <div>
+                          <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '4px' }}>Booked At</div>
+                          <div style={{ fontWeight: '600', color: 'var(--text-main)' }}>
+                            {ticket.bookedAt ? new Date(ticket.bookedAt).toLocaleString('en-US') : 'Recently booked'}
+                          </div>
+                        </div>
+                        <div>
+                          <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '4px' }}>Total Paid</div>
+                          <div style={{ fontWeight: '800', color: 'var(--seat-booked-self)' }}>₹{ticket.totalAmount}</div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        ) : !selectedEventId ? (
           /* SECTION 1: Event Showcase Grid */
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
@@ -423,6 +550,7 @@ function App() {
                     selectedSeats={selectedSeats}
                     onSeatClick={handleSeatClick}
                     activeReservation={activeReservation}
+                    user={user}
                   />
 
                   {/* Order review */}

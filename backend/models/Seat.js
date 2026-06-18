@@ -23,6 +23,15 @@ const seatSchema = new mongoose.Schema({
   reservedAt: { 
     type: Date, 
     default: null 
+  },
+  bookedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
+  },
+  bookedAt: {
+    type: Date,
+    default: null
   }
 }, { timestamps: true });
 

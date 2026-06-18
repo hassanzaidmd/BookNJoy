@@ -163,7 +163,7 @@ exports.confirmBooking = async (req, res) => {
         reservationId: reservation._id
       },
       {
-        $set: { status: 'booked' },
+        $set: { status: 'booked', bookedBy: userId, bookedAt: new Date() },
         $unset: { reservationId: 1, reservedAt: 1 }
       }
     );
@@ -186,5 +186,57 @@ exports.confirmBooking = async (req, res) => {
   } catch (err) {
     console.error('Booking Confirmation Error:', err);
     res.status(500).json({ message: 'Server error during booking confirmation' });
+  }
+};
+
+// @desc    Retrieve all bookings made by the logged-in user
+// @route   GET /api/bookings/me
+exports.getMyBookings = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const bookedSeats = await Seat.find({
+      bookedBy: userId,
+      status: 'booked'
+    })
+      .populate('eventId')
+      .sort({ bookedAt: -1, updatedAt: -1 })
+      .lean();
+
+    const bookingsByEvent = bookedSeats.reduce((acc, seat) => {
+      const event = seat.eventId;
+      if (!event) return acc;
+
+      const eventId = String(event._id);
+      if (!acc[eventId]) {
+        acc[eventId] = {
+          event: {
+            id: eventId,
+            name: event.name,
+            date: event.date,
+            venue: event.venue,
+            price: event.price
+          },
+          seatNumbers: [],
+          bookedAt: seat.bookedAt || seat.updatedAt || seat.createdAt,
+          totalAmount: 0
+        };
+      }
+
+      acc[eventId].seatNumbers.push(seat.seatNumber);
+      acc[eventId].totalAmount = acc[eventId].seatNumbers.length * event.price;
+
+      const seatBookedAt = seat.bookedAt || seat.updatedAt || seat.createdAt;
+      if (seatBookedAt && new Date(seatBookedAt) > new Date(acc[eventId].bookedAt)) {
+        acc[eventId].bookedAt = seatBookedAt;
+      }
+
+      return acc;
+    }, {});
+
+    res.json(Object.values(bookingsByEvent));
+  } catch (err) {
+    console.error('Get My Bookings Error:', err);
+    res.status(500).json({ message: 'Server error while retrieving your bookings' });
   }
 };

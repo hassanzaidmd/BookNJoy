@@ -1,6 +1,6 @@
 import React from 'react';
 
-const SeatMap = ({ seats, selectedSeats, onSeatClick, activeReservation }) => {
+const SeatMap = ({ seats, selectedSeats, onSeatClick, activeReservation, user }) => {
   
   // Group seats by their row character (e.g. 'A' from 'A1')
   const seatsByRow = seats.reduce((acc, seat) => {
@@ -25,7 +25,12 @@ const SeatMap = ({ seats, selectedSeats, onSeatClick, activeReservation }) => {
   // Determine button background matching state
   const getSeatColor = (seat) => {
     const isSelected = selectedSeats.includes(seat.seatNumber);
+    const isBookedByMe = seat.status === 'booked' && user && String(seat.bookedBy) === String(user.id);
     
+    if (isBookedByMe) {
+      return 'var(--seat-booked-self)';
+    }
+
     if (seat.status === 'booked') {
       return 'var(--seat-booked)';
     }
@@ -54,8 +59,10 @@ const SeatMap = ({ seats, selectedSeats, onSeatClick, activeReservation }) => {
     const isReservedByMe = activeReservation && 
       seat.status === 'reserved' && 
       seat.reservationId === activeReservation._id;
+    const isBookedByMe = seat.status === 'booked' && user && String(seat.bookedBy) === String(user.id);
 
-    if (seat.status === 'booked') return `Seat ${seat.seatNumber} (Booked)`;
+    if (isBookedByMe) return `Seat ${seat.seatNumber} (Booked by you)`;
+    if (seat.status === 'booked') return `Seat ${seat.seatNumber} (Booked by another user)`;
     if (isReservedByMe) return `Seat ${seat.seatNumber} (Reserved by you)`;
     if (seat.status === 'reserved') return `Seat ${seat.seatNumber} (Reserved by another user)`;
     if (selectedSeats.includes(seat.seatNumber)) return `Seat ${seat.seatNumber} (Selected)`;
@@ -170,9 +177,9 @@ const SeatMap = ({ seats, selectedSeats, onSeatClick, activeReservation }) => {
                         e.currentTarget.style.transform = 'scale(1)';
                       }
                     }}
-                  >
-                    {seat.seatNumber.slice(1)}
-                  </button>
+                    >
+                      {seat.seatNumber.slice(1)}
+                    </button>
                 );
               })}
             </div>
@@ -232,8 +239,13 @@ const SeatMap = ({ seats, selectedSeats, onSeatClick, activeReservation }) => {
         </div>
         
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem' }}>
+          <div style={{ width: '16px', height: '16px', borderRadius: '4px', background: 'var(--seat-booked-self)' }} />
+          <span style={{ color: 'var(--text-muted)' }}>Booked by You</span>
+        </div>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem' }}>
           <div style={{ width: '16px', height: '16px', borderRadius: '4px', background: 'var(--seat-booked)' }} />
-          <span style={{ color: 'var(--text-muted)' }}>Booked</span>
+          <span style={{ color: 'var(--text-muted)' }}>Booked by Others</span>
         </div>
       </div>
     </div>

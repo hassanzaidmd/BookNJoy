@@ -44,6 +44,7 @@ A simplified event ticket booking application built using the MERN stack (Node.j
    ```env
    PORT=5000
    MONGO_URI=mongodb://localhost:27017/booknjoy
+   FRONTEND_URL=http://localhost:5173
    JWT_SECRET=your_custom_secret_key
    ```
    *Note: If no `.env` is created, the server will fallback to a **MongoDB Memory Server** running on port `5000` and automatically seed the database.*
@@ -69,6 +70,13 @@ A simplified event ticket booking application built using the MERN stack (Node.j
    npm run dev
    ```
 4. Open the browser and visit the URL displayed in the terminal (usually `http://localhost:5173`).
+
+### Frontend API Configuration
+If your backend is deployed somewhere else, set this in `frontend/.env`:
+```env
+VITE_API_BASE_URL=https://your-backend-url.com
+```
+If it is not set, the frontend falls back to `http://localhost:5000`.
 
 ---
 
